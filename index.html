@@ -8,17 +8,31 @@
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
-  padding: 15px;
+  margin: 0;
+}
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  padding: 12px 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
 }
 h2 {
   text-align: center;
+  margin: 0;
 }
 #progresso {
   text-align: center;
   font-weight: bold;
-  margin-bottom: 15px;
+  margin-top: 6px;
 }
-ul { padding: 0; }
+main {
+  padding: 110px 15px 15px;
+}
+ul { padding: 0; margin: 0; }
 li {
   list-style: none;
   background: #fff;
@@ -41,9 +55,14 @@ li {
 </head>
 <body>
 
-<h2>📖 Leitura Biblica</h2>
-<p id="progresso"></p>
-<ul id="lista"></ul>
+<header>
+  <h2>📖 Leitura Biblica</h2>
+  <div id="progresso"></div>
+</header>
+
+<main>
+  <ul id="lista"></ul>
+</main>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -77,7 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const salvos = JSON.parse(localStorage.getItem("checksBiblia") || "{}");
 
   const totalCapitulos = capitulos.length;
-
   let ultimoIndiceMarcado = -1;
 
   let dia = 0;
@@ -90,60 +108,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const id = "dia" + dia;
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = !!salvos[id];
-    checkbox.onchange = function () {
-      salvos[id] = this.checked;
-      localStorage.setItem("checksBiblia", JSON.stringify(salvos));
-      atualizarProgresso();
-    };
-
-    if (salvos[id]) {
-      ultimoIndiceMarcado = dia;
-    }
-
-    const spanData = document.createElement("span");
-    spanData.className = "data";
-    spanData.textContent = data.toLocaleDateString("pt-BR");
-
-    const spanTexto = document.createElement("span");
-    spanTexto.textContent =
-      capitulos[i] + (capitulos[i+1] ? " e " + capitulos[i+1] : "");
-
-    li.appendChild(checkbox);
-    li.appendChild(spanData);
-    li.appendChild(spanTexto);
-    lista.appendChild(li);
-
-    dia++;
-  }
-
-  function atualizarProgresso() {
-    let diasConcluidos = Object.values(salvos).filter(v => v).length;
-    let capitulosLidos = diasConcluidos * 2;
-    if (capitulosLidos > totalCapitulos) capitulosLidos = totalCapitulos;
-
-    let percentual = ((capitulosLidos / totalCapitulos) * 100).toFixed(1);
-
-    document.getElementById("progresso").textContent =
-      `📊 Progresso: ${percentual}% (${capitulosLidos} / ${totalCapitulos} capítulos)`;
-  }
-
-  atualizarProgresso();
-
-  setTimeout(() => {
-    const alvoIndex = ultimoIndiceMarcado >= 0 ? ultimoIndiceMarcado : 0;
-    const alvo = lista.children[alvoIndex];
-    if (alvo) {
-      alvo.classList.add("atual");
-      const top = alvo.getBoundingClientRect().top + window.pageYOffset;
-      window.scrollTo({ top: top - 100, behavior: "smooth" });
-    }
-  }, 400);
-
-});
-</script>
-
-</body>
-</html>
+    const checkbox = document.cre
