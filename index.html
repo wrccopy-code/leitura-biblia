@@ -10,7 +10,7 @@ body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
   margin: 0;
-  padding-top: 110px; /* espaço para o header fixo */
+  padding-top: 145px; /* espaço para header + barra */
 }
 
 header {
@@ -19,7 +19,7 @@ header {
   left: 0;
   right: 0;
   background: #ffffff;
-  padding: 12px 15px;
+  padding: 12px 15px 15px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   z-index: 1000;
 }
@@ -29,10 +29,27 @@ h2 {
   margin: 0;
 }
 
-#progresso {
+#progresso-texto {
   text-align: center;
   font-weight: bold;
   margin-top: 6px;
+}
+
+#barra-container {
+  width: 100%;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+#barra {
+  height: 100%;
+  width: 0%;
+  background: #4caf50;
+  border-radius: 6px;
+  transition: width 0.3s ease;
 }
 
 ul {
@@ -67,7 +84,10 @@ li {
 
 <header>
   <h2>📖 Leitura Biblica</h2>
-  <div id="progresso"></div>
+  <div id="progresso-texto"></div>
+  <div id="barra-container">
+    <div id="barra"></div>
+  </div>
 </header>
 
 <ul id="lista"></ul>
@@ -144,10 +164,12 @@ document.addEventListener("DOMContentLoaded", function () {
   function atualizarProgresso() {
     let diasConcluidos = Object.values(salvos).filter(v => v).length;
     let capitulosLidos = Math.min(diasConcluidos * 2, totalCapitulos);
-    let percentual = ((capitulosLidos / totalCapitulos) * 100).toFixed(1);
+    let percentual = (capitulosLidos / totalCapitulos) * 100;
 
-    document.getElementById("progresso").textContent =
-      `📊 Progresso: ${percentual}% (${capitulosLidos} / ${totalCapitulos} capítulos)`;
+    document.getElementById("progresso-texto").textContent =
+      `📊 Progresso: ${percentual.toFixed(1)}% (${capitulosLidos} / ${totalCapitulos} capítulos)`;
+
+    document.getElementById("barra").style.width = percentual + "%";
   }
 
   atualizarProgresso();
@@ -157,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (alvo) {
       alvo.classList.add("atual");
       const top = alvo.getBoundingClientRect().top + window.pageYOffset;
-      window.scrollTo({ top: top - 120, behavior: "smooth" });
+      window.scrollTo({ top: top - 140, behavior: "smooth" });
     }
   }, 400);
 
