@@ -30,9 +30,9 @@ li {
   font-weight: bold;
   min-width: 95px;
 }
-.hoje {
-  background: #dff0d8;
-  border-left: 5px solid #3c763d;
+.atual {
+  background: #e3f2fd;
+  border-left: 5px solid #1565c0;
 }
 </style>
 </head>
@@ -69,29 +69,21 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const inicio = new Date(2026, 4, 1); // 01/05/2026
-  const hoje = new Date();
-  hoje.setHours(0,0,0,0);
-
   const lista = document.getElementById("lista");
   const salvos = JSON.parse(localStorage.getItem("checksBiblia") || "{}");
 
-  let elementoHoje = null;
+  let ultimoMarcado = null;
   let dia = 0;
 
   for (let i = 0; i < capitulos.length; i += 2) {
     const data = new Date(inicio);
     data.setDate(inicio.getDate() + dia);
-    data.setHours(0,0,0,0);
 
     const dataStr = data.toLocaleDateString("pt-BR");
     const texto = capitulos[i] + (capitulos[i+1] ? " e " + capitulos[i+1] : "");
     const id = "dia" + dia;
 
     const li = document.createElement("li");
-    if (data.getTime() === hoje.getTime()) {
-      li.classList.add("hoje");
-      elementoHoje = li;
-    }
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -100,6 +92,10 @@ document.addEventListener("DOMContentLoaded", function () {
       salvos[id] = this.checked;
       localStorage.setItem("checksBiblia", JSON.stringify(salvos));
     };
+
+    if (salvos[id]) {
+      ultimoMarcado = li;
+    }
 
     const spanData = document.createElement("span");
     spanData.className = "data";
@@ -116,9 +112,11 @@ document.addEventListener("DOMContentLoaded", function () {
     dia++;
   }
 
-  if (elementoHoje) {
+  const alvo = ultimoMarcado || lista.firstChild;
+  if (alvo) {
+    alvo.classList.add("atual");
     setTimeout(() => {
-      elementoHoje.scrollIntoView({ block: "center" });
+      alvo.scrollIntoView({ block: "center" });
     }, 300);
   }
 
