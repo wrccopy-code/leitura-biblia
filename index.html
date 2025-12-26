@@ -4,12 +4,15 @@
 <meta charset="UTF-8">
 <title>Leitura Biblica</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
   margin: 0;
+  padding-top: 110px; /* espaço para o header fixo */
 }
+
 header {
   position: fixed;
   top: 0;
@@ -20,19 +23,23 @@ header {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   z-index: 1000;
 }
+
 h2 {
   text-align: center;
   margin: 0;
 }
+
 #progresso {
   text-align: center;
   font-weight: bold;
   margin-top: 6px;
 }
-main {
-  padding: 110px 15px 15px;
+
+ul {
+  padding: 0 15px 15px;
+  margin: 0;
 }
-ul { padding: 0; margin: 0; }
+
 li {
   list-style: none;
   background: #fff;
@@ -43,16 +50,19 @@ li {
   gap: 10px;
   border-radius: 5px;
 }
+
 .data {
   font-weight: bold;
   min-width: 95px;
 }
+
 .atual {
   background: #e3f2fd;
   border-left: 5px solid #1565c0;
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -60,9 +70,7 @@ li {
   <div id="progresso"></div>
 </header>
 
-<main>
-  <ul id="lista"></ul>
-</main>
+<ul id="lista"></ul>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -104,8 +112,57 @@ document.addEventListener("DOMContentLoaded", function () {
     data.setDate(inicio.getDate() + dia);
 
     const li = document.createElement("li");
-    li.dataset.index = dia;
-
     const id = "dia" + dia;
 
-    const checkbox = document.cre
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!salvos[id];
+    checkbox.onchange = function () {
+      salvos[id] = this.checked;
+      localStorage.setItem("checksBiblia", JSON.stringify(salvos));
+      atualizarProgresso();
+    };
+
+    if (salvos[id]) ultimoIndiceMarcado = dia;
+
+    const spanData = document.createElement("span");
+    spanData.className = "data";
+    spanData.textContent = data.toLocaleDateString("pt-BR");
+
+    const spanTexto = document.createElement("span");
+    spanTexto.textContent =
+      capitulos[i] + (capitulos[i+1] ? " e " + capitulos[i+1] : "");
+
+    li.appendChild(checkbox);
+    li.appendChild(spanData);
+    li.appendChild(spanTexto);
+    lista.appendChild(li);
+
+    dia++;
+  }
+
+  function atualizarProgresso() {
+    let diasConcluidos = Object.values(salvos).filter(v => v).length;
+    let capitulosLidos = Math.min(diasConcluidos * 2, totalCapitulos);
+    let percentual = ((capitulosLidos / totalCapitulos) * 100).toFixed(1);
+
+    document.getElementById("progresso").textContent =
+      `📊 Progresso: ${percentual}% (${capitulosLidos} / ${totalCapitulos} capítulos)`;
+  }
+
+  atualizarProgresso();
+
+  setTimeout(() => {
+    const alvo = lista.children[ultimoIndiceMarcado >= 0 ? ultimoIndiceMarcado : 0];
+    if (alvo) {
+      alvo.classList.add("atual");
+      const top = alvo.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: top - 120, behavior: "smooth" });
+    }
+  }, 400);
+
+});
+</script>
+
+</body>
+</html>
