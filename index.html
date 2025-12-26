@@ -13,6 +13,11 @@ body {
 h2 {
   text-align: center;
 }
+#progresso {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
 ul { padding: 0; }
 li {
   list-style: none;
@@ -37,6 +42,7 @@ li {
 <body>
 
 <h2>📖 Leitura Biblica</h2>
+<p id="progresso"></p>
 <ul id="lista"></ul>
 
 <script>
@@ -70,6 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const lista = document.getElementById("lista");
   const salvos = JSON.parse(localStorage.getItem("checksBiblia") || "{}");
 
+  const totalCapitulos = capitulos.length;
+
   let ultimoIndiceMarcado = -1;
 
   let dia = 0;
@@ -88,6 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
     checkbox.onchange = function () {
       salvos[id] = this.checked;
       localStorage.setItem("checksBiblia", JSON.stringify(salvos));
+      atualizarProgresso();
     };
 
     if (salvos[id]) {
@@ -110,7 +119,19 @@ document.addEventListener("DOMContentLoaded", function () {
     dia++;
   }
 
-  // 🔽 rolagem robusta (Safari iOS)
+  function atualizarProgresso() {
+    let diasConcluidos = Object.values(salvos).filter(v => v).length;
+    let capitulosLidos = diasConcluidos * 2;
+    if (capitulosLidos > totalCapitulos) capitulosLidos = totalCapitulos;
+
+    let percentual = ((capitulosLidos / totalCapitulos) * 100).toFixed(1);
+
+    document.getElementById("progresso").textContent =
+      `📊 Progresso: ${percentual}% (${capitulosLidos} / ${totalCapitulos} capítulos)`;
+  }
+
+  atualizarProgresso();
+
   setTimeout(() => {
     const alvoIndex = ultimoIndiceMarcado >= 0 ? ultimoIndiceMarcado : 0;
     const alvo = lista.children[alvoIndex];
