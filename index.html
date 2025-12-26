@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Plano de Leitura da Bíblia</title>
+<title>Leitura Biblica</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
@@ -12,6 +12,9 @@ body {
 }
 h2 {
   text-align: center;
+}
+ul {
+  padding: 0;
 }
 li {
   list-style: none;
@@ -35,60 +38,92 @@ li {
 </head>
 <body>
 
-<h2>📖 Leitura Bíblica</h2>
+<h2>📖 Leitura Biblica</h2>
 <ul id="lista"></ul>
 
 <script>
-const livros = [
-["Gn",50],["Êx",40],["Lv",27],["Nm",36],["Dt",34],
-["Js",24],["Jz",21],["Rt",4],["1Sm",31],["2Sm",24],
-["1Rs",22],["2Rs",25],["1Cr",29],["2Cr",36],
-["Ed",10],["Ne",13],["Et",10],["Jó",42],["Sl",150],
-["Pv",31],["Ec",12],["Ct",8],["Is",66],["Jr",52],
-["Lm",5],["Ez",48],["Dn",12],["Os",14],["Jl",3],
-["Am",9],["Ob",1],["Jn",4],["Mq",7],["Na",3],
-["Hc",3],["Sf",3],["Ag",2],["Zc",14],["Ml",4],
-["Mt",28],["Mc",16],["Lc",24],["Jo",21],["At",28],
-["Rm",16],["1Co",16],["2Co",13],["Gl",6],["Ef",6],
-["Fp",4],["Cl",4],["1Ts",5],["2Ts",3],["1Tm",6],
-["2Tm",4],["Tt",3],["Fm",1],["Hb",13],["Tg",5],
-["1Pe",5],["2Pe",3],["1Jo",5],["2Jo",1],["3Jo",1],
-["Jd",1],["Ap",22]
-];
+document.addEventListener("DOMContentLoaded", function () {
 
-let capitulos = [];
-livros.forEach(l => {
-  for(let i=1;i<=l[1];i++){
-    capitulos.push(`${l[0]} ${i}`);
+  const livros = [
+    ["Gn",50],["Ex",40],["Lv",27],["Nm",36],["Dt",34],
+    ["Js",24],["Jz",21],["Rt",4],["1Sm",31],["2Sm",24],
+    ["1Rs",22],["2Rs",25],["1Cr",29],["2Cr",36],
+    ["Ed",10],["Ne",13],["Et",10],["Jo",42],["Sl",150],
+    ["Pv",31],["Ec",12],["Ct",8],["Is",66],["Jr",52],
+    ["Lm",5],["Ez",48],["Dn",12],["Os",14],["Jl",3],
+    ["Am",9],["Ob",1],["Jn",4],["Mq",7],["Na",3],
+    ["Hc",3],["Sf",3],["Ag",2],["Zc",14],["Ml",4],
+    ["Mt",28],["Mc",16],["Lc",24],["Jo",21],["At",28],
+    ["Rm",16],["1Co",16],["2Co",13],["Gl",6],["Ef",6],
+    ["Fp",4],["Cl",4],["1Ts",5],["2Ts",3],["1Tm",6],
+    ["2Tm",4],["Tt",3],["Fm",1],["Hb",13],["Tg",5],
+    ["1Pe",5],["2Pe",3],["1Jo",5],["2Jo",1],["3Jo",1],
+    ["Jd",1],["Ap",22]
+  ];
+
+  let capitulos = [];
+  livros.forEach(l => {
+    for (let i = 1; i <= l[1]; i++) {
+      capitulos.push(l[0] + " " + i);
+    }
+  });
+
+  const inicio = new Date(2026, 4, 1); // 01/05/2026
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+
+  const lista = document.getElementById("lista");
+  const salvos = JSON.parse(localStorage.getItem("checksBiblia") || "{}");
+
+  let elementoHoje = null;
+  let dia = 0;
+
+  for (let i = 0; i < capitulos.length; i += 2) {
+    const data = new Date(inicio);
+    data.setDate(inicio.getDate() + dia);
+    data.setHours(0,0,0,0);
+
+    const dataStr = data.toLocaleDateString("pt-BR");
+    const texto = capitulos[i] + (capitulos[i+1] ? " e " + capitulos[i+1] : "");
+    const id = "dia" + dia;
+
+    const li = document.createElement("li");
+    if (data.getTime() === hoje.getTime()) {
+      li.classList.add("hoje");
+      elementoHoje = li;
+    }
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!salvos[id];
+    checkbox.onchange = function () {
+      salvos[id] = this.checked;
+      localStorage.setItem("checksBiblia", JSON.stringify(salvos));
+    };
+
+    const spanData = document.createElement("span");
+    spanData.className = "data";
+    spanData.textContent = dataStr;
+
+    const spanTexto = document.createElement("span");
+    spanTexto.textContent = texto;
+
+    li.appendChild(checkbox);
+    li.appendChild(spanData);
+    li.appendChild(spanTexto);
+    lista.appendChild(li);
+
+    dia++;
   }
+
+  if (elementoHoje) {
+    setTimeout(() => {
+      elementoHoje.scrollIntoView({ block: "center" });
+    }, 300);
+  }
+
 });
+</script>
 
-const inicio = new Date(2026,4,1); // 01/05/2026
-const hoje = new Date();
-hoje.setHours(0,0,0,0);
-
-const lista = document.getElementById("lista");
-const salvos = JSON.parse(localStorage.getItem("checksBiblia") || "{}");
-
-let elementoHoje = null;
-let dia = 0;
-
-for(let i=0;i<capitulos.length;i+=2){
-  const data = new Date(inicio);
-  data.setDate(inicio.getDate() + dia);
-  data.setHours(0,0,0,0);
-
-  const dataStr = data.toLocaleDateString("pt-BR");
-  const c1 = capitulos[i];
-  const c2 = capitulos[i+1] ? " e " + capitulos[i+1] : "";
-
-  const id = `dia${dia}`;
-  const checked = salvos[id] ? "checked" : "";
-
-  const li = document.createElement("li");
-  if (data.getTime() === hoje.getTime()) {
-    li.classList.add("hoje");
-    elementoHoje = li;
-  }
-
-  li.innerHTML
+</body>
+</html>
