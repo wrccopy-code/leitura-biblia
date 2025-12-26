@@ -13,9 +13,7 @@ body {
 h2 {
   text-align: center;
 }
-ul {
-  padding: 0;
-}
+ul { padding: 0; }
 li {
   list-style: none;
   background: #fff;
@@ -68,22 +66,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  const inicio = new Date(2026, 4, 1); // 01/05/2026
+  const inicio = new Date(2026, 4, 1);
   const lista = document.getElementById("lista");
   const salvos = JSON.parse(localStorage.getItem("checksBiblia") || "{}");
 
-  let ultimoMarcado = null;
-  let dia = 0;
+  let ultimoIndiceMarcado = -1;
 
+  let dia = 0;
   for (let i = 0; i < capitulos.length; i += 2) {
     const data = new Date(inicio);
     data.setDate(inicio.getDate() + dia);
 
-    const dataStr = data.toLocaleDateString("pt-BR");
-    const texto = capitulos[i] + (capitulos[i+1] ? " e " + capitulos[i+1] : "");
-    const id = "dia" + dia;
-
     const li = document.createElement("li");
+    li.dataset.index = dia;
+
+    const id = "dia" + dia;
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -94,15 +91,16 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     if (salvos[id]) {
-      ultimoMarcado = li;
+      ultimoIndiceMarcado = dia;
     }
 
     const spanData = document.createElement("span");
     spanData.className = "data";
-    spanData.textContent = dataStr;
+    spanData.textContent = data.toLocaleDateString("pt-BR");
 
     const spanTexto = document.createElement("span");
-    spanTexto.textContent = texto;
+    spanTexto.textContent =
+      capitulos[i] + (capitulos[i+1] ? " e " + capitulos[i+1] : "");
 
     li.appendChild(checkbox);
     li.appendChild(spanData);
@@ -112,13 +110,16 @@ document.addEventListener("DOMContentLoaded", function () {
     dia++;
   }
 
-  const alvo = ultimoMarcado || lista.firstChild;
-  if (alvo) {
-    alvo.classList.add("atual");
-    setTimeout(() => {
-      alvo.scrollIntoView({ block: "center" });
-    }, 300);
-  }
+  // 🔽 rolagem robusta (Safari iOS)
+  setTimeout(() => {
+    const alvoIndex = ultimoIndiceMarcado >= 0 ? ultimoIndiceMarcado : 0;
+    const alvo = lista.children[alvoIndex];
+    if (alvo) {
+      alvo.classList.add("atual");
+      const top = alvo.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: top - 100, behavior: "smooth" });
+    }
+  }, 400);
 
 });
 </script>
